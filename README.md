@@ -1,3 +1,3 @@
 # React Sheet Music
 
-Component to render sheet music.
+Component to render interactive sheet music.
