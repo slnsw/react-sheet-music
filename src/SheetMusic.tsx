@@ -29,7 +29,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     start: Function;
     stop: Function;
   }>();
-
+  console.log(bpm);
   const computeNoteAndOctave = n => {
     // Note number n is an integer 0 = C, 1 = D, ... 6 = B
     const noteLetters = {};
@@ -41,7 +41,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     noteLetters[5] = 'A';
     noteLetters[6] = 'B';
     // And 7 is C on the next octave up. Note integers can be negative.
-    // This cases a problem when using modulo - so add a large multiple
+    // This causes a problem when using modulo - so add a large multiple
     // of 7 to avoid negatives.
     const note = noteLetters[(n + 700) % 7];
     // The + 2 here makes sure note 0 is in the correct octave
@@ -106,9 +106,14 @@ const SheetMusic: React.FunctionComponent<Props> = ({
 
   React.useEffect(() => {
     if (notation) {
+      // Use abcjs' built in parser to turn the
+      // text string into structured JSON:
       const json = abcjs.parseOnly(notation);
+      // now use my function to turn that into an array
+      // of notes or chords using note names and durations
+      // that things like Tone.js and Reactronica understand:
       const noteList = parseJSON(json);
-      console.log(noteList);
+      // Now render actual score:
       const tune = abcjs.renderAbc('paper', notation, {
         add_classes: true,
         scale,
@@ -117,7 +122,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
 
       timer.current = new abcjs.TimingCallbacks(tune[0], {
         qpm: bpm,
-        beatSubdivisions: 4,
+        beatSubdivisions: json[0].lines[0].staff[0].meter.value[0].num, // 4,
         beatCallback: (beatNumber, totalBeats, totalTime) => {
           if (typeof onBeat === 'function') {
             onBeat(beatNumber, totalBeats, totalTime);
@@ -133,9 +138,10 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             if (event === null) {
               onEvent(null);
             } else {
-              // Event.midiPitches isn't working, so we need to work out pitch from ABC notation
-              // const note = notation[event.startChar];
-              // const note = notation.slice(event.startChar, event.endChar);
+              // Event.midiPitches isn't working, so we need to work out pitch from ABC notation.
+              // We use the array of start and end positions in the notation string that point
+              // out which notes are being played at this point in time. Each pair of these is
+              // formed into a unique key for our array of notes: noteList.
               const allNotes = event.startCharArray.map((_, index) => {
                 const startChar = event.startCharArray[index];
                 const endChar = event.endCharArray[index];
@@ -151,11 +157,6 @@ const SheetMusic: React.FunctionComponent<Props> = ({
                   notes: charNotes,
                 });
               }
-
-              // onEvent({
-              //   ...event,
-              //   note,
-              // });
             }
           }
 
