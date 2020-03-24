@@ -3,6 +3,7 @@ import React from 'react';
 import abcjs from 'abcjs';
 
 type Props = {
+  id?: string;
   isPlaying?: boolean;
   /** In ABC notation format */
   notation?: string;
@@ -15,21 +16,20 @@ type Props = {
 };
 
 const SheetMusic: React.FunctionComponent<Props> = ({
+  id = 'sheet-music',
   isPlaying,
   notation,
-  bpm,
+  bpm = 80,
   scale = 1,
   className,
   onBeat,
   onEvent,
   onLineEnd,
 }) => {
-  // const paper = React.useRef();
   const timer = React.useRef<{
     start: Function;
     stop: Function;
   }>();
-  console.log(bpm);
   const computeNoteAndOctave = n => {
     // Note number n is an integer 0 = C, 1 = D, ... 6 = B
     const noteLetters = {};
@@ -53,8 +53,9 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   const parseJSON = json => {
     let line: any;
     let staff: any;
-
-    const data = json[0]; // this assumes there is only one song.
+    // this assumes there is only one song.
+    const data = json[0];
+    // this assumes the meter is the same for all staffs and lines
     const beatsPerBar = data.lines[0].staff[0].meter.value[0].num;
     const notes = {};
     let tripletMultiplier = 1;
@@ -81,6 +82,8 @@ const SheetMusic: React.FunctionComponent<Props> = ({
               if (pitch.accidental && pitch.accidental === 'flat') {
                 accidental = 'b';
               }
+              // not specifically looking for the 'natural' accidental
+              // marker ('=') as a natural F is just an F (right?)
               const no = computeNoteAndOctave(pitch.pitch);
               const noteName = no.note;
               const octave = no.octave;
@@ -109,7 +112,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
       // Use abcjs' built in parser to turn the
       // text string into structured JSON:
       const json = abcjs.parseOnly(notation);
-      // now use my function to turn that into an array
+      // now use our function to turn that into an array
       // of notes or chords using note names and durations
       // that things like Tone.js and Reactronica understand:
       const noteList = parseJSON(json);
@@ -139,9 +142,9 @@ const SheetMusic: React.FunctionComponent<Props> = ({
               onEvent(null);
             } else {
               // Event.midiPitches isn't working, so we need to work out pitch from ABC notation.
-              // We use the array of start and end positions in the notation string that point
-              // out which notes are being played at this point in time. Each pair of these is
-              // formed into a unique key for our array of notes: noteList.
+              // We use the event's array of start and end positions (positions in the notation string)
+              // that point out which notes are being played at this point in time (ie event).
+              // Each pair of these is formed into a unique key for our array of notes: noteList.
               const allNotes = event.startCharArray.map((_, index) => {
                 const startChar = event.startCharArray[index];
                 const endChar = event.endCharArray[index];
@@ -164,20 +167,43 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             return null;
           }
 
-          // const notes = document.getElementsByClassName('abcjs-note');
-          // const rests = document.getElementsByClassName('abcjs-rest');
+          const notes = document.getElementsByClassName('abcjs-note');
+          const rests = document.getElementsByClassName('abcjs-rest');
+          const lyrics = document.getElementsByClassName('abcjs-lyric');
 
-          // for (let note of notes) {
-          //   note.classList.remove('abcjs-note-playing');
-          // }
+          // Remove all highlighted notes
+          for (let note of notes) {
+            note.classList.remove('abcjs-note-playing');
+          }
 
-          // for (let rest of rests) {
-          //   rest.classList.remove('abcjs-note-playing');
-          // }
+          for (let rest of rests) {
+            rest.classList.remove('abcjs-note-playing');
+          }
 
+          for (let lyric of lyrics) {
+            lyric.classList.remove('abcjs-lyric-playing');
+          }
+
+          // Highlight current playing notes
           // event.elements.forEach(element => {
           //   element[0].classList.add('abcjs-note-playing');
           // });
+          event.elements.forEach(nodes => {
+            nodes.forEach(node => {
+              const classes = node.className.baseVal;
+              let type;
+
+              if (classes.indexOf('abcjs-lyric') > -1) {
+                type = 'lyric';
+              } else if (classes.indexOf('abcjs-rest') > -1) {
+                type = 'rest';
+              } else if (classes.indexOf('abcjs-note') > -1) {
+                type = 'note';
+              }
+
+              node.classList.add(`abcjs-${type}-playing`);
+            });
+          });
 
           return null;
         },
@@ -205,19 +231,41 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   return (
     <>
       <div
-        id="paper"
+        id={id}
         // ref={paper}
         className={className || ''}
       ></div>
 
       <style>
         {`
-          #paper .abcjs-note, #paper .abcjs-rest {
+          .sheet-music {
+            width: 100%;
+            margin: 0 auto 2rem auto;
+            background-color: #FFF;
+          }
+
+          #${id} .abcjs-note {
             transition: 0.2s;
           }
 
-          #paper .abcjs-note-playing {
-            fill: #d10fc9;
+          #${id} .abcjs-rest {
+            transition: 0.2s;
+          }
+
+          #${id} .abcjs-note-playing {
+            fill: #e6007e;
+          }
+
+          #${id} .abcjs-rest-playing {
+            fill: #e6007e;
+          }
+
+          #${id} .abcjs-lyric-playing {
+            fill: #e6007e;
+          }
+
+          #${id} .abcjs-note_selected {
+            fill: #e6007e;
           }
         `}
       </style>

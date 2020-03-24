@@ -27,6 +27,7 @@ const App = () => {
         {isPlaying ? 'Stop' : 'Play'}
       </button>
       <SheetMusic
+        id='paper'
         notation={song.notation}
         bpm={80}
         onEvent={handleEvent}
