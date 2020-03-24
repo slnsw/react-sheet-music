@@ -30,7 +30,8 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     start: Function;
     stop: Function;
   }>();
-  const computeNoteAndOctave = n => {
+
+  const computeNoteAndOctave = (n) => {
     // Note number n is an integer 0 = C, 1 = D, ... 6 = B
     const noteLetters = {};
     noteLetters[0] = 'C';
@@ -47,10 +48,11 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     // The + 2 here makes sure note 0 is in the correct octave
     const octave = Math.floor(n / 7) + 2;
     const out = { note, octave };
+
     return out;
   };
 
-  const parseJSON = json => {
+  const parseJSON = (json) => {
     let line: any;
     let staff: any;
     // this assumes there is only one song.
@@ -131,12 +133,12 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             onBeat(beatNumber, totalBeats, totalTime);
           }
         },
-        lineEndCallback: info => {
+        lineEndCallback: (info) => {
           if (typeof onLineEnd === 'function') {
             onLineEnd(info);
           }
         },
-        eventCallback: event => {
+        eventCallback: (event) => {
           if (typeof onEvent === 'function') {
             if (event === null) {
               onEvent(null);
@@ -153,7 +155,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
               // now smoosh all the notes into one array and remove nulls (rests)
               const charNotes = []
                 .concat(...allNotes)
-                .filter(char => Boolean(char));
+                .filter((char) => Boolean(char));
               if (typeof onEvent === 'function') {
                 onEvent({
                   ...event,
@@ -184,12 +186,9 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             lyric.classList.remove('abcjs-lyric-playing');
           }
 
-          // Highlight current playing notes
-          // event.elements.forEach(element => {
-          //   element[0].classList.add('abcjs-note-playing');
-          // });
-          event.elements.forEach(nodes => {
-            nodes.forEach(node => {
+          // Highlight current playing lyric/rest/note
+          event.elements.forEach((nodes) => {
+            nodes.forEach((node) => {
               const classes = node.className.baseVal;
               let type;
 
@@ -230,11 +229,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
 
   return (
     <>
-      <div
-        id={id}
-        // ref={paper}
-        className={className || ''}
-      ></div>
+      <div id={id} className={className || ''}></div>
 
       <style>
         {`
