@@ -177,7 +177,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
           }
 
           for (let rest of rests) {
-            rest.classList.remove('abcjs-note-playing');
+            rest.classList.remove('abcjs-rest-playing');
           }
 
           for (let lyric of lyrics) {
