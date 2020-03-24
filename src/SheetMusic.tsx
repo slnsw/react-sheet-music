@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import abcjs from 'abcjs';
 
@@ -9,10 +8,21 @@ type Props = {
   notation?: string;
   bpm?: number;
   scale?: number;
+  staffWidth?: number;
+  responsive?: boolean;
+  oneSvgPerLine?: boolean;
   className?: string;
+  onClick?: Function;
   onBeat?: Function;
   onEvent?: Function;
   onLineEnd?: Function;
+};
+
+type Note = {
+  name: string;
+  duration: number;
+  octave: number;
+  line: number;
 };
 
 const SheetMusic: React.FunctionComponent<Props> = ({
@@ -21,7 +31,11 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   notation,
   bpm = 80,
   scale = 1,
+  staffWidth = 800,
+  responsive = true,
+  oneSvgPerLine = false,
   className,
+  onClick,
   onBeat,
   onEvent,
   onLineEnd,
@@ -62,43 +76,53 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     const notes = {};
     let tripletMultiplier = 1;
     const lines = Object.values(data.lines);
+
     for (line of lines) {
       let staffNum = 0;
       const staves = Object.values(line.staff);
+
       for (staff of staves) {
         const voices = staff.voices[0];
+
         for (const note of voices) {
           if (note.startTriplet) {
             tripletMultiplier = note.tripletMultiplier;
           }
+
           if (note.pitches && note.el_type === 'note') {
             const duration =
               note.duration * tripletMultiplier * (60 / bpm) * beatsPerBar;
             const index = `s${note.startChar}e${note.endChar}`;
-            const reactronicaNotes = [];
+            const reactronicaNotes: Note[] = [];
+
             for (const pitch of note.pitches) {
               let accidental = '';
+
               if (pitch.accidental && pitch.accidental === 'sharp') {
                 accidental = '#';
               }
+
               if (pitch.accidental && pitch.accidental === 'flat') {
                 accidental = 'b';
               }
+
               // not specifically looking for the 'natural' accidental
               // marker ('=') as a natural F is just an F (right?)
-              const no = computeNoteAndOctave(pitch.pitch);
-              const noteName = no.note;
-              const octave = no.octave;
+              const { note, octave } = computeNoteAndOctave(pitch.pitch);
+
               const noteBlob = {
-                name: `${noteName}${accidental}${octave}`,
+                name: `${note}${accidental}${octave}`,
                 duration,
                 octave,
                 line: staffNum,
               };
+
               reactronicaNotes.push(noteBlob);
             }
+
             notes[index] = reactronicaNotes;
           }
+
           if (note.endTriplet) {
             tripletMultiplier = 1;
           }
@@ -122,7 +146,14 @@ const SheetMusic: React.FunctionComponent<Props> = ({
       const tune = abcjs.renderAbc('paper', notation, {
         add_classes: true,
         scale,
-        staffwidth: 1200,
+        staffwidth: staffWidth,
+        responsive,
+        oneSvgPerLine,
+        ...(typeof onClick === 'function'
+          ? {
+              clickListener: onClick,
+            }
+          : {}),
       });
 
       timer.current = new abcjs.TimingCallbacks(tune[0], {
@@ -174,16 +205,18 @@ const SheetMusic: React.FunctionComponent<Props> = ({
           const lyrics = document.getElementsByClassName('abcjs-lyric');
 
           // Remove all highlighted notes
-          for (let note of notes) {
-            note.classList.remove('abcjs-note-playing');
+          for (let note of [].slice.call(notes)) {
+            note.classList.remove('abcjs-note_playing');
           }
 
-          for (let rest of rests) {
-            rest.classList.remove('abcjs-rest-playing');
+          // Remove all highlighted rests
+          for (let rest of [].slice.call(rests)) {
+            rest.classList.remove('abcjs-rest_playing');
           }
 
-          for (let lyric of lyrics) {
-            lyric.classList.remove('abcjs-lyric-playing');
+          // Remove all highlighted lyrics
+          for (let lyric of [].slice.call(lyrics)) {
+            lyric.classList.remove('abcjs-lyric_playing');
           }
 
           // Highlight current playing lyric/rest/note
@@ -200,7 +233,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
                 type = 'note';
               }
 
-              node.classList.add(`abcjs-${type}-playing`);
+              node.classList.add(`abcjs-${type}_playing`);
             });
           });
 
@@ -229,41 +262,31 @@ const SheetMusic: React.FunctionComponent<Props> = ({
 
   return (
     <>
-      <div id={id} className={className || ''}></div>
+      <div id={id} className={['sheet-music', className || ''].join(' ')}></div>
 
-      <style>
+      {/* <style>
         {`
           .sheet-music {
-            width: 100%;
-            margin: 0 auto 2rem auto;
             background-color: #FFF;
           }
 
-          #${id} .abcjs-note {
-            transition: 0.2s;
-          }
-
-          #${id} .abcjs-rest {
-            transition: 0.2s;
-          }
-
-          #${id} .abcjs-note-playing {
+          .sheet-music .abcjs-note_playing {
             fill: #e6007e;
           }
 
-          #${id} .abcjs-rest-playing {
+          .sheet-music .abcjs-rest_playing {
             fill: #e6007e;
           }
 
-          #${id} .abcjs-lyric-playing {
+          .sheet-music .abcjs-lyric_playing {
             fill: #e6007e;
           }
 
-          #${id} .abcjs-note_selected {
+          .sheet-music .abcjs-note_selected {
             fill: #e6007e;
           }
         `}
-      </style>
+      </style> */}
     </>
   );
 };
