@@ -1,5 +1,5 @@
 import React from 'react';
-import abcjs from 'abcjs';
+// import abcjs from 'abcjs';
 
 import './SheetMusic.css';
 
@@ -153,114 +153,120 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   };
 
   React.useEffect(() => {
-    if (notation) {
-      // Use abcjs' built in parser to turn the
-      // text string into structured JSON:
-      const json = abcjs.parseOnly(notation);
-      // now use our function to turn that into an array
-      // of notes or chords using note names and durations
-      // that things like Tone.js and Reactronica understand:
-      const noteList = parseJSON(json);
-      // Now render actual score:
-      const tune = abcjs.renderAbc(id, notation, {
-        add_classes: true,
-        scale,
-        staffwidth: staffWidth,
-        responsive,
-        oneSvgPerLine,
-        ...(typeof onClick === 'function'
-          ? {
-              clickListener: onClick,
-            }
-          : {}),
-      });
+    if (typeof window !== 'undefined') {
+      /* eslint-disable */
+      const abcjs = require('abcjs');
+      /* eslint-enable */
 
-      timer.current = new abcjs.TimingCallbacks(tune[0], {
-        qpm: bpm,
-        beatSubdivisions: json[0].lines[0].staff[0].meter.value[0].num, // 4,
-        beatCallback: (beatNumber, totalBeats, totalTime) => {
-          if (typeof onBeat === 'function') {
-            onBeat(beatNumber, totalBeats, totalTime);
-          }
-        },
-        lineEndCallback: (info) => {
-          if (typeof onLineEnd === 'function') {
-            onLineEnd(info);
-          }
-        },
-        eventCallback: (event) => {
-          if (typeof onEvent === 'function') {
-            if (event === null) {
-              onEvent(null);
-            } else {
-              // Event.midiPitches isn't working, so we need to work out pitch from ABC notation.
-              // We use the event's array of start and end positions (positions in the notation string)
-              // that point out which notes are being played at this point in time (ie event).
-              // Each pair of these is formed into a unique key for our array of notes: noteList.
-              const allNotes = event.startCharArray.map((_, index) => {
-                const startChar = event.startCharArray[index];
-                const endChar = event.endCharArray[index];
-                return noteList[`s${startChar}e${endChar}`];
-              });
-              // now smoosh all the notes into one array and remove nulls (rests)
-              const charNotes = []
-                .concat(...allNotes)
-                .filter((char) => Boolean(char));
-              if (typeof onEvent === 'function') {
-                onEvent({
-                  ...event,
-                  notes: charNotes,
+      if (notation) {
+        // Use abcjs' built in parser to turn the
+        // text string into structured JSON:
+        const json = abcjs.parseOnly(notation);
+        // now use our function to turn that into an array
+        // of notes or chords using note names and durations
+        // that things like Tone.js and Reactronica understand:
+        const noteList = parseJSON(json);
+
+        // Now render actual score:
+        const tune = abcjs.renderAbc(id, notation, {
+          add_classes: true,
+          scale,
+          staffwidth: staffWidth,
+          responsive,
+          oneSvgPerLine,
+          ...(typeof onClick === 'function'
+            ? {
+                clickListener: onClick,
+              }
+            : {}),
+        });
+
+        timer.current = new abcjs.TimingCallbacks(tune[0], {
+          qpm: bpm,
+          beatSubdivisions: json[0].lines[0].staff[0].meter.value[0].num, // 4,
+          beatCallback: (beatNumber, totalBeats, totalTime) => {
+            if (typeof onBeat === 'function') {
+              onBeat(beatNumber, totalBeats, totalTime);
+            }
+          },
+          lineEndCallback: (info) => {
+            if (typeof onLineEnd === 'function') {
+              onLineEnd(info);
+            }
+          },
+          eventCallback: (event) => {
+            if (typeof onEvent === 'function') {
+              if (event === null) {
+                onEvent(null);
+              } else {
+                // Event.midiPitches isn't working, so we need to work out pitch from ABC notation.
+                // We use the event's array of start and end positions (positions in the notation string)
+                // that point out which notes are being played at this point in time (ie event).
+                // Each pair of these is formed into a unique key for our array of notes: noteList.
+                const allNotes = event.startCharArray.map((_, index) => {
+                  const startChar = event.startCharArray[index];
+                  const endChar = event.endCharArray[index];
+                  return noteList[`s${startChar}e${endChar}`];
                 });
+                // now smoosh all the notes into one array and remove nulls (rests)
+                const charNotes = []
+                  .concat(...allNotes)
+                  .filter((char) => Boolean(char));
+                if (typeof onEvent === 'function') {
+                  onEvent({
+                    ...event,
+                    notes: charNotes,
+                  });
+                }
               }
             }
-          }
 
-          if (!event) {
-            return null;
-          }
+            if (!event) {
+              return null;
+            }
 
-          const notes = document.getElementsByClassName('abcjs-note');
-          const rests = document.getElementsByClassName('abcjs-rest');
-          const lyrics = document.getElementsByClassName('abcjs-lyric');
+            const notes = document.getElementsByClassName('abcjs-note');
+            const rests = document.getElementsByClassName('abcjs-rest');
+            const lyrics = document.getElementsByClassName('abcjs-lyric');
 
-          // Remove all highlighted notes
-          for (let note of [].slice.call(notes)) {
-            note.classList.remove('abcjs-note_playing');
-          }
+            // Remove all highlighted notes
+            for (let note of [].slice.call(notes)) {
+              note.classList.remove('abcjs-note_playing');
+            }
 
-          // Remove all highlighted rests
-          for (let rest of [].slice.call(rests)) {
-            rest.classList.remove('abcjs-rest_playing');
-          }
+            // Remove all highlighted rests
+            for (let rest of [].slice.call(rests)) {
+              rest.classList.remove('abcjs-rest_playing');
+            }
 
-          // Remove all highlighted lyrics
-          for (let lyric of [].slice.call(lyrics)) {
-            lyric.classList.remove('abcjs-lyric_playing');
-          }
+            // Remove all highlighted lyrics
+            for (let lyric of [].slice.call(lyrics)) {
+              lyric.classList.remove('abcjs-lyric_playing');
+            }
 
-          // Highlight current playing lyric/rest/note
-          event.elements.forEach((nodes) => {
-            nodes.forEach((node) => {
-              const classes = node.className.baseVal;
-              let type;
+            // Highlight current playing lyric/rest/note
+            event.elements.forEach((nodes) => {
+              nodes.forEach((node) => {
+                const classes = node.className.baseVal;
+                let type;
 
-              if (classes.indexOf('abcjs-lyric') > -1) {
-                type = 'lyric';
-              } else if (classes.indexOf('abcjs-rest') > -1) {
-                type = 'rest';
-              } else if (classes.indexOf('abcjs-note') > -1) {
-                type = 'note';
-              }
+                if (classes.indexOf('abcjs-lyric') > -1) {
+                  type = 'lyric';
+                } else if (classes.indexOf('abcjs-rest') > -1) {
+                  type = 'rest';
+                } else if (classes.indexOf('abcjs-note') > -1) {
+                  type = 'note';
+                }
 
-              node.classList.add(`abcjs-${type}_playing`);
+                node.classList.add(`abcjs-${type}_playing`);
+              });
             });
-          });
 
-          return null;
-        },
-      });
+            return null;
+          },
+        });
+      }
     }
-
     /* eslint-disable */
   }, [JSON.stringify(notation)]);
   /* eslint-enable */
