@@ -24,12 +24,6 @@
       "pre-commit": "tsdx lint"
     }
   },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
   "name": "@slnsw/react-sheet-music",
   "author": "Kaho Cheung",
   "module": "dist/react-sheet-music.esm.js",
@@ -46,6 +40,7 @@
     "husky": "^4.2.3",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
+    "rollup-plugin-postcss": "^2.5.0",
     "ts-loader": "^6.2.1",
     "tsdx": "^0.13.0",
     "tslib": "^1.11.1",
@@ -53,5 +48,18 @@
   },
   "dependencies": {
     "abcjs": "^5.12.0"
-  }
+  },
+  "description": "React component to render interactive sheet music using [ABC notation](http://abcnotation.com/learn). Powered by [ABC JS](https://paulrosen.github.io/abcjs/) under the hood.",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slnsw/react-sheet-music.git"
+  },
+  "bugs": {
+    "url": "https://github.com/slnsw/react-sheet-music/issues"
+  },
+  "homepage": "https://github.com/slnsw/react-sheet-music#readme"
 }
