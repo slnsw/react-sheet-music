@@ -48,5 +48,18 @@
   },
   "dependencies": {
     "abcjs": "^5.12.0"
-  }
+  },
+  "description": "React component to render interactive sheet music using [ABC notation](http://abcnotation.com/learn). Powered by [ABC JS](https://paulrosen.github.io/abcjs/) under the hood.",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slnsw/react-sheet-music.git"
+  },
+  "bugs": {
+    "url": "https://github.com/slnsw/react-sheet-music/issues"
+  },
+  "homepage": "https://github.com/slnsw/react-sheet-music#readme"
 }
