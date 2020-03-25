@@ -45,7 +45,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     // of 7 to avoid negatives.
     const note = noteLetters[(n + 700) % 7];
     // The + 2 here makes sure note 0 is in the correct octave
-    const octave = Math.floor(n / 7) + 2;
+    const octave = Math.floor(n / 7) + 3;
     const out = { note, octave };
     return out;
   };
@@ -53,6 +53,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   const parseJSON = json => {
     let line: any;
     let staff: any;
+    let adj: any;
     // this assumes there is only one song.
     const data = json[0];
     // this assumes the meter is the same for all staffs and lines
@@ -65,6 +66,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
       const staves = Object.values(line.staff);
       for (staff of staves) {
         const voices = staff.voices[0];
+        const keyAdjustments = staff.key.accidentals;
         for (const note of voices) {
           if (note.startTriplet) {
             tripletMultiplier = note.tripletMultiplier;
@@ -75,6 +77,9 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             const index = `s${note.startChar}e${note.endChar}`;
             const reactronicaNotes = [];
             for (const pitch of note.pitches) {
+              const noteAndOctave = computeNoteAndOctave(pitch.pitch);
+              const noteName = noteAndOctave.note;
+              const octave = noteAndOctave.octave;
               let accidental = '';
               if (pitch.accidental && pitch.accidental === 'sharp') {
                 accidental = '#';
@@ -82,11 +87,24 @@ const SheetMusic: React.FunctionComponent<Props> = ({
               if (pitch.accidental && pitch.accidental === 'flat') {
                 accidental = 'b';
               }
-              // not specifically looking for the 'natural' accidental
-              // marker ('=') as a natural F is just an F (right?)
-              const no = computeNoteAndOctave(pitch.pitch);
-              const noteName = no.note;
-              const octave = no.octave;
+              for (adj of keyAdjustments) {
+                if (
+                  pitch.accidental &&
+                  noteName === adj.note.toUpperCase() &&
+                  pitch.accidental !== 'natural' &&
+                  adj.acc === 'sharp'
+                ) {
+                  accidental = '#';
+                }
+                if (
+                  pitch.accidental &&
+                  noteName === adj.note.toUpperCase() &&
+                  pitch.accidental !== 'natural' &&
+                  adj.acc === 'flat'
+                ) {
+                  accidental = 'b';
+                }
+              }
               const noteBlob = {
                 name: `${noteName}${accidental}${octave}`,
                 duration,
