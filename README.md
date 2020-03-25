@@ -1,6 +1,12 @@
 # React Sheet Music
 
-Component to render interactive sheet music.
+React component to render interactive sheet music using [ABC notation](http://abcnotation.com/learn). Powered by [ABC JS](https://paulrosen.github.io/abcjs/) under the hood.
+
+# Install
+
+```bash
+$ npm install @slnsw/react-sheet-music
+```
 
 # Development
 

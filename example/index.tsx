@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import SheetMusic from '../.';
-import '../src/SheetMusic.css';
+import '../dist/SheetMusic.css';
 
 import songs from './songs';
 

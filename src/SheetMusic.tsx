@@ -1,6 +1,8 @@
 import React from 'react';
 import abcjs from 'abcjs';
 
+import './SheetMusic.css';
+
 type Props = {
   id?: string;
   isPlaying?: boolean;
