@@ -162,7 +162,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
       // that things like Tone.js and Reactronica understand:
       const noteList = parseJSON(json);
       // Now render actual score:
-      const tune = abcjs.renderAbc('paper', notation, {
+      const tune = abcjs.renderAbc(id, notation, {
         add_classes: true,
         scale,
         staffwidth: staffWidth,

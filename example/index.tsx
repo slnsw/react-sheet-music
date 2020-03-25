@@ -28,7 +28,7 @@ const App = () => {
       </button>
 
       <SheetMusic
-        id="paper"
+        // id="paper"
         className="test"
         notation={song.notation}
         bpm={80}
