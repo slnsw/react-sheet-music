@@ -64,14 +64,21 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     // The + 2 here makes sure note 0 is in the correct octave
     const octave = Math.floor(n / 7) + 3;
     const out = { note, octave };
+    return out;
+  };
 
+  const listAdjustments = (adjs) => {
+    const out = {};
+    for (let adj of adjs) {
+      out[adj.note.toUpperCase()] = adj.acc;
+    }
     return out;
   };
 
   const parseJSON = (json) => {
     let line: any;
     let staff: any;
-    let adj: any;
+    let adjustments: any;
     // this assumes there is only one song.
     const data = json[0];
     // this assumes the meter is the same for all staffs and lines
@@ -79,51 +86,45 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     const notes = {};
     let tripletMultiplier = 1;
     const lines = Object.values(data.lines);
-
     for (line of lines) {
       let staffNum = 0;
       const staves = Object.values(line.staff);
-
       for (staff of staves) {
         const voices = staff.voices[0];
-        const keyAdjustments = staff.key.accidentals;
+        adjustments = listAdjustments(staff.key.accidentals);
         for (const note of voices) {
+          if (note.el_type === 'bar') {
+            // clear the adjustments each bar - note that this doesn't
+            // allow for ties to carry accidentals to next bar...
+            adjustments = listAdjustments(staff.key.accidentals);
+          }
           if (note.startTriplet) {
             tripletMultiplier = note.tripletMultiplier;
           }
-
           if (note.pitches && note.el_type === 'note') {
             const duration =
               note.duration * tripletMultiplier * (60 / bpm) * beatsPerBar;
             const index = `s${note.startChar}e${note.endChar}`;
             const reactronicaNotes: Note[] = [];
-
             for (const pitch of note.pitches) {
               const noteAndOctave = computeNoteAndOctave(pitch.pitch);
               const noteName = noteAndOctave.note;
               const octave = noteAndOctave.octave;
+              // note this doesn't allow for double sharp, double flat, etc
               let accidental = '';
-              if (pitch.accidental && pitch.accidental === 'sharp') {
+              if (pitch.accidental) {
+                adjustments[`${noteName}${octave}`] = pitch.accidental;
+              }
+              if (adjustments[`${noteName}${octave}`] === 'sharp') {
                 accidental = '#';
-              }
-              if (pitch.accidental && pitch.accidental === 'flat') {
+              } else if (adjustments[`${noteName}${octave}`] === 'flat') {
                 accidental = 'b';
-              }
-              for (adj of keyAdjustments) {
-                if (
-                  noteName === adj.note.toUpperCase() &&
-                  !(pitch.accidental === 'natural') &&
-                  adj.acc === 'sharp'
-                ) {
-                  accidental = '#';
-                }
-                if (
-                  noteName === adj.note.toUpperCase() &&
-                  !(pitch.accidental === 'natural') &&
-                  adj.acc === 'flat'
-                ) {
-                  accidental = 'b';
-                }
+              } else if (adjustments[`${noteName}${octave}`] === 'natural') {
+                accidental = '';
+              } else if (adjustments[`${noteName}`] === 'sharp') {
+                accidental = '#';
+              } else if (adjustments[`${noteName}`] === 'flat') {
+                accidental = 'b';
               }
               const noteBlob = {
                 name: `${noteName}${accidental}${octave}`,
@@ -131,13 +132,10 @@ const SheetMusic: React.FunctionComponent<Props> = ({
                 octave,
                 line: staffNum,
               };
-
               reactronicaNotes.push(noteBlob);
             }
-
             notes[index] = reactronicaNotes;
           }
-
           if (note.endTriplet) {
             tripletMultiplier = 1;
           }
