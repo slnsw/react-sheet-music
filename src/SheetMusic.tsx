@@ -103,27 +103,23 @@ const SheetMusic: React.FunctionComponent<Props> = ({
               const noteName = noteAndOctave.note;
               const octave = noteAndOctave.octave;
               let accidental = '';
-
               if (pitch.accidental && pitch.accidental === 'sharp') {
                 accidental = '#';
               }
-
               if (pitch.accidental && pitch.accidental === 'flat') {
                 accidental = 'b';
               }
               for (adj of keyAdjustments) {
                 if (
-                  pitch.accidental &&
                   noteName === adj.note.toUpperCase() &&
-                  pitch.accidental !== 'natural' &&
+                  !(pitch.accidental === 'natural') &&
                   adj.acc === 'sharp'
                 ) {
                   accidental = '#';
                 }
                 if (
-                  pitch.accidental &&
                   noteName === adj.note.toUpperCase() &&
-                  pitch.accidental !== 'natural' &&
+                  !(pitch.accidental === 'natural') &&
                   adj.acc === 'flat'
                 ) {
                   accidental = 'b';
