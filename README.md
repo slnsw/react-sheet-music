@@ -1,5 +1,7 @@
 # React Sheet Music
 
+===
+
 React component to render interactive sheet music using [ABC notation](http://abcnotation.com/learn). Powered by [ABC JS](https://paulrosen.github.io/abcjs/) under the hood.
 
 > Work in progress
@@ -28,15 +30,16 @@ const MyComponent = () => {
 
 # Props
 
-| Prop      | Type     | Description                                                                               |
-| --------- | -------- | ----------------------------------------------------------------------------------------- |
-| notation  | string   | Textual representation of music in ABC notation                                           |
-| isPlaying | boolean  | If playing, the notes will highlight and onBeat, onEvent and onLineEnd callbacks will run |
-| className | string   | Custom class name to add to sheet music div                                               |
-| onClick   | function | Callback for when any part of the sheet music is clicked on                               |
-| onBeat    | function |                                                                                           |
-| onEvent   | function |                                                                                           |
-| onLineEnd | function |                                                                                           |
+| Prop       | Type     | Description                                                                               |
+| ---------- | -------- | ----------------------------------------------------------------------------------------- |
+| notation   | string   | Textual representation of music in ABC notation                                           |
+| isPlaying  | boolean  | If playing, the notes will highlight and onBeat, onEvent and onLineEnd callbacks will run |
+| responsive | string   | Undefined or 'resize'                                                                     |
+| className  | string   | Custom class name to add to sheet music div                                               |
+| onClick    | function | Callback for when any part of the sheet music is clicked on                               |
+| onBeat     | function |                                                                                           |
+| onEvent    | function |                                                                                           |
+| onLineEnd  | function |                                                                                           |
 
 # Development
 
