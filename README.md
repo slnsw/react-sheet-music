@@ -1,7 +1,5 @@
 # React Sheet Music
 
-===
-
 React component to render interactive sheet music using [ABC notation](http://abcnotation.com/learn). Powered by [ABC JS](https://paulrosen.github.io/abcjs/) under the hood.
 
 > Work in progress
