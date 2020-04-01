@@ -15,7 +15,7 @@ export const parseJSON = (json, { bpm }) => {
   // this assumes there is only one song.
   const data = json[0];
   // this assumes the meter is the same for all staffs and lines
-  const beatsPerBar = data.lines[0].staff[0].meter.value[0].num;
+  const wholeNoteMultiplier = data.lines[0].staff[0].meter.value[0].den;
   const notes = {};
   let tripletMultiplier = 1;
   const lines = Object.values(data.lines);
@@ -36,7 +36,10 @@ export const parseJSON = (json, { bpm }) => {
         }
         if (note.pitches && note.el_type === 'note') {
           const duration =
-            note.duration * tripletMultiplier * (60 / bpm) * beatsPerBar;
+            note.duration *
+            tripletMultiplier *
+            (60 / bpm) *
+            wholeNoteMultiplier;
           const index = `s${note.startChar}e${note.endChar}`;
           const reactronicaNotes: Note[] = [];
 
