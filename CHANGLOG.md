@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.5] - 2020-04-06
 
-- Separated rending from timing callbacks
+- Separated rendering from timing callbacks into two useEffects
 
 ## [0.0.4] - 2020-04-01
 
