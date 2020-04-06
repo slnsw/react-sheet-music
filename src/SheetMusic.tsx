@@ -97,16 +97,12 @@ const SheetMusic: React.FunctionComponent<Props> = ({
 
   React.useEffect(() => {
     if (notation && abcjs?.current && tune?.current && json?.current) {
-      // console.log(json.current);
       timer.current = new abcjs.current.TimingCallbacks(tune.current[0], {
         qpm: bpm,
         beatSubdivisions: json.current[0].lines[0].staff[0].meter.value[0].num, // 4,
         beatCallback: (beatNumber, totalBeats, totalTime) => {
           if (typeof onBeat === 'function') {
             onBeat(beatNumber, totalBeats, totalTime);
-            if (tune && tune.current) {
-              tune.current[0].setTiming(bpm);
-            }
           }
         },
         lineEndCallback: (info) => {
@@ -144,7 +140,6 @@ const SheetMusic: React.FunctionComponent<Props> = ({
               }
             }
           }
-
           if (!event) {
             return null;
           }
@@ -189,13 +184,8 @@ const SheetMusic: React.FunctionComponent<Props> = ({
         },
       });
     }
-
-    // uncomment this below and remove bpm from the above useEffect, also comment out lines 96-98.
-    // React.useEffect(() => {
-    //   if (tune && tune.current) {
-    //     tune.current[0].setTiming(bpm);
-    //     console.log(bpm, tune.current[0].getBpm(bpm));
-    //   }
+    // NOTE! changing bpm while song is playing causes ugly things to happen!
+    // may want to add something to prevent changes if isPlaying...
   }, [notation, bpm]);
 
   React.useEffect(() => {
