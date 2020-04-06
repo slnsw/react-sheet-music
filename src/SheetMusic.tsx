@@ -186,7 +186,9 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     }
     // NOTE! changing bpm while song is playing causes ugly things to happen!
     // may want to add something to prevent changes if isPlaying...
+    /* eslint-disable */
   }, [notation, bpm]);
+  /* eslint-enable */
 
   React.useEffect(() => {
     if (timer && timer.current) {
