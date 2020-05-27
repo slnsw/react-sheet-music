@@ -19,6 +19,7 @@ type Props = {
   onBeat?: Function;
   onEvent?: Function;
   onLineEnd?: Function;
+  returnFormat?: string;
 };
 
 export type Note = {
@@ -42,6 +43,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   onBeat,
   onEvent,
   onLineEnd,
+  // returnFormat = 'event',
 }) => {
   const timer = React.useRef<{
     start: Function;
@@ -115,7 +117,8 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             if (event === null) {
               onEvent(null);
             } else {
-              // Event.midiPitches isn't working, so we need to work out pitch from ABC notation.
+              // console.log(event);
+              // Event.midiPitches didn't use to be working, so we needed to work out pitch from ABC notation.
               // We use the event's array of start and end positions (positions in the notation string)
               // that point out which notes are being played at this point in time (ie event).
               // Each pair of these is formed into a unique key for our array of notes: noteList.
@@ -123,6 +126,8 @@ const SheetMusic: React.FunctionComponent<Props> = ({
                 const startChar = event.startCharArray[index];
                 const endChar = event.endCharArray[index];
                 if (noteList?.current) {
+                  // console.log(noteList.current[`s${startChar}e${endChar}`]);
+                  // console.log(event.midiPitches);
                   return noteList.current[`s${startChar}e${endChar}`];
                 } else {
                   return null;

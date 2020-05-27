@@ -14,6 +14,7 @@ export const parseJSON = (json, { bpm }) => {
   let adjustments: any;
   // this assumes there is only one song.
   const data = json[0];
+  // console.log(data);
   // this assumes the meter is the same for all staffs and lines
   const wholeNoteMultiplier = data.lines[0].staff[0].meter.value[0].den;
   const notes = {};
@@ -63,11 +64,17 @@ export const parseJSON = (json, { bpm }) => {
             } else if (adjustments[`${noteName}`] === 'flat') {
               accidental = 'b';
             }
+            const midiNoteNumber = computeMidiNoteNumber(
+              noteName,
+              accidental,
+              octave,
+            );
             const noteBlob = {
               name: `${noteName}${accidental}${octave}`,
               duration,
               octave,
               line: staffNum,
+              midiNoteNumber,
             };
             reactronicaNotes.push(noteBlob);
           }
@@ -103,6 +110,50 @@ export const computeNoteAndOctave = (noteNumber: number) => {
   // The + 2 here makes sure note 0 is in the correct octave
   const octave = Math.floor(noteNumber / 7) + 3;
   const out = { note, octave };
+
+  return out;
+};
+
+export const computeMidiNoteNumber = (
+  noteName: string,
+  accidental: string,
+  octave: number,
+) => {
+  const letterToNumber = {};
+
+  letterToNumber['C'] = 24;
+  letterToNumber['D'] = 26;
+  letterToNumber['E'] = 28;
+  letterToNumber['F'] = 29;
+  letterToNumber['G'] = 31;
+  letterToNumber['A'] = 33;
+  letterToNumber['B'] = 35;
+
+  const flatAllowed = {};
+
+  flatAllowed['A'] = true;
+  flatAllowed['B'] = true;
+  flatAllowed['C'] = false;
+  flatAllowed['D'] = true;
+  flatAllowed['E'] = true;
+  flatAllowed['F'] = false;
+  flatAllowed['G'] = true;
+
+  const sharpAllowed = {};
+
+  sharpAllowed['A'] = true;
+  sharpAllowed['B'] = false;
+  sharpAllowed['C'] = true;
+  sharpAllowed['D'] = true;
+  sharpAllowed['E'] = false;
+  sharpAllowed['F'] = true;
+  sharpAllowed['G'] = true;
+
+  const out =
+    letterToNumber[noteName] +
+    (accidental === 'b' && flatAllowed[noteName] ? -1 : 0) +
+    (accidental === '#' && sharpAllowed[noteName] ? 1 : 0) +
+    octave * 12;
 
   return out;
 };
