@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { parseJSON } from './lib/utils';
+import { parseJSON, computeNoteAndOctaveFromMidiNoteNumber } from './lib/utils';
 
 import './SheetMusic.css';
 
@@ -117,6 +117,14 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             if (event === null) {
               onEvent(null);
             } else {
+              if (event.midiPitches) {
+                event.midiPitches.map((p) => {
+                  if (p.pitch) {
+                    const m = computeNoteAndOctaveFromMidiNoteNumber(p.pitch);
+                    console.log(m);
+                  }
+                });
+              }
               // console.log(event);
               // Event.midiPitches didn't use to be working, so we needed to work out pitch from ABC notation.
               // We use the event's array of start and end positions (positions in the notation string)

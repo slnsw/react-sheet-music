@@ -157,3 +157,43 @@ export const computeMidiNoteNumber = (
 
   return out;
 };
+
+export const computeNoteAndOctaveFromMidiNoteNumber = (
+  midiNoteNumber: number,
+) => {
+  const noteLetters = {};
+  noteLetters[0] = 'C';
+  noteLetters[1] = 'C';
+  noteLetters[2] = 'D';
+  noteLetters[3] = 'D';
+  noteLetters[4] = 'E';
+  noteLetters[5] = 'F';
+  noteLetters[6] = 'F';
+  noteLetters[7] = 'G';
+  noteLetters[8] = 'G';
+  noteLetters[9] = 'A';
+  noteLetters[10] = 'B';
+  noteLetters[11] = 'B';
+
+  const accidental = {};
+  accidental[0] = '';
+  accidental[1] = '#';
+  accidental[2] = '';
+  accidental[3] = '#';
+  accidental[4] = '';
+  accidental[5] = '';
+  accidental[6] = '#';
+  accidental[7] = '';
+  accidental[8] = '#';
+  accidental[9] = '';
+  accidental[10] = 'b';
+  accidental[11] = '';
+
+  const octave = Math.floor(midiNoteNumber / 12) - 2; // or -1 ... depends...
+  const noteNum = midiNoteNumber % 12;
+  const note = noteLetters[noteNum];
+  const acc = accidental[noteNum];
+  const out = { note, acc, octave };
+
+  return out;
+};
