@@ -46,8 +46,8 @@ export const parseJSON = (json, { bpm }) => {
 
           for (const pitch of note.pitches) {
             const noteAndOctave = computeNoteAndOctave(pitch.pitch);
-            const noteName = noteAndOctave.note;
-            const octave = noteAndOctave.octave;
+            let noteName = noteAndOctave.note;
+            let octave = noteAndOctave.octave;
             // note this doesn't allow for double sharp, double flat, etc
             let accidental = '';
             if (pitch.accidental) {
@@ -63,6 +63,22 @@ export const parseJSON = (json, { bpm }) => {
               accidental = '#';
             } else if (adjustments[`${noteName}`] === 'flat') {
               accidental = 'b';
+            }
+            // fix no-existant notes.
+            if (noteName === 'E' && accidental === '#') {
+              noteName = 'F';
+              accidental = '';
+            } else if (noteName === 'F' && accidental === 'b') {
+              noteName = 'E';
+              accidental = '';
+            } else if (noteName === 'B' && accidental === '#') {
+              noteName = 'C';
+              accidental = '';
+              octave += 1;
+            } else if (noteName === 'C' && accidental === 'b') {
+              noteName = 'F';
+              accidental = '';
+              octave -= 1;
             }
             const midiNoteNumber = computeMidiNoteNumber(
               noteName,

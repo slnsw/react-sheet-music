@@ -117,15 +117,16 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             if (event === null) {
               onEvent(null);
             } else {
+              // This is just here for testing - it outputs the midiNote data and our conversion
               if (event.midiPitches) {
                 event.midiPitches.map((p) => {
                   if (p.pitch) {
                     const m = computeNoteAndOctaveFromMidiNoteNumber(p.pitch);
-                    console.log(m);
+                    console.log(p.pitch, m);
                   }
                 });
               }
-              // console.log(event);
+
               // Event.midiPitches didn't use to be working, so we needed to work out pitch from ABC notation.
               // We use the event's array of start and end positions (positions in the notation string)
               // that point out which notes are being played at this point in time (ie event).
@@ -145,10 +146,22 @@ const SheetMusic: React.FunctionComponent<Props> = ({
               const charNotes = []
                 .concat(...allNotes)
                 .filter((char) => Boolean(char));
+
+              const newNotes = charNotes.map((nt) => {
+                const m = computeNoteAndOctaveFromMidiNoteNumber(
+                  nt['midiNoteNumber'],
+                );
+                // const name = `${m.note}${m.acc}${m.octave}`;
+                // const duration =
+
+                return { line: nt['line'], ...m };
+              });
+
               if (typeof onEvent === 'function') {
                 onEvent({
                   ...event,
                   notes: charNotes,
+                  newNotes,
                 });
               }
             }

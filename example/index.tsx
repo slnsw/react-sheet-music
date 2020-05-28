@@ -17,6 +17,9 @@ const App = () => {
       console.log(event.notes);
       console.log('--- abcjs midi note data ---');
       console.log(event.midiPitches);
+      console.log('--- new notes! ---');
+      console.log(event.newNotes);
+      console.log('--- ------- END -------- ---');
     }
   };
 
