@@ -14,6 +14,10 @@ type Props = {
   staffWidth?: number;
   responsive?: boolean;
   oneSvgPerLine?: boolean;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
   className?: string;
   onClick?: Function;
   onBeat?: Function;
@@ -37,12 +41,17 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   staffWidth = 800,
   responsive = 'resize',
   oneSvgPerLine = false,
+  paddingTop,
+  paddingRight,
+  paddingBottom,
+  paddingLeft,
   className,
   onClick,
   onBeat,
   onEvent,
   onLineEnd,
 }) => {
+  console.log(paddingRight);
   const timer = React.useRef<{
     start: Function;
     stop: Function;
@@ -83,6 +92,10 @@ const SheetMusic: React.FunctionComponent<Props> = ({
           staffwidth: staffWidth,
           responsive,
           oneSvgPerLine,
+          paddingtop: paddingTop,
+          paddingright: paddingRight,
+          paddingbottom: paddingBottom,
+          paddingleft: paddingLeft,
           ...(typeof onClick === 'function'
             ? {
                 clickListener: onClick,
