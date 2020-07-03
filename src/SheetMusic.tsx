@@ -14,6 +14,9 @@ type Props = {
   staffWidth?: number;
   responsive?: boolean;
   oneSvgPerLine?: boolean;
+  visualTranspose?: number;
+  print?: boolean;
+  wrap?: object;
   paddingTop?: number;
   paddingRight?: number;
   paddingBottom?: number;

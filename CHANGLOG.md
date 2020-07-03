@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.6] - 2020-XX-XX
 
-- Add padding params
+- Add more params
 
 ## [0.0.5] - 2020-04-06
 
