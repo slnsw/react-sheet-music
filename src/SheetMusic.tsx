@@ -14,6 +14,10 @@ type Props = {
   staffWidth?: number;
   responsive?: boolean;
   oneSvgPerLine?: boolean;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
   className?: string;
   onClick?: Function;
   onBeat?: Function;
@@ -38,6 +42,10 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   staffWidth = 800,
   responsive = 'resize',
   oneSvgPerLine = false,
+  paddingTop,
+  paddingRight,
+  paddingBottom,
+  paddingLeft,
   className,
   onClick,
   onBeat,
@@ -45,6 +53,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
   onLineEnd,
   // returnFormat = 'event',
 }) => {
+  console.log(paddingRight);
   const timer = React.useRef<{
     start: Function;
     stop: Function;
@@ -85,6 +94,10 @@ const SheetMusic: React.FunctionComponent<Props> = ({
           staffwidth: staffWidth,
           responsive,
           oneSvgPerLine,
+          paddingtop: paddingTop,
+          paddingright: paddingRight,
+          paddingbottom: paddingBottom,
+          paddingleft: paddingLeft,
           ...(typeof onClick === 'function'
             ? {
                 clickListener: onClick,
@@ -212,7 +225,9 @@ const SheetMusic: React.FunctionComponent<Props> = ({
     }
     // NOTE! changing bpm while song is playing causes ugly things to happen!
     // may want to add something to prevent changes if isPlaying...
+    /* eslint-disable */
   }, [notation, bpm]);
+  /* eslint-enable */
 
   React.useEffect(() => {
     if (timer && timer.current) {
