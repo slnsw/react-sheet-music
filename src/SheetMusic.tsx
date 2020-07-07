@@ -132,7 +132,7 @@ const SheetMusic: React.FunctionComponent<Props> = ({
             } else {
               // This is just here for testing - it outputs the midiNote data and our conversion
               if (event.midiPitches) {
-                event.midiPitches.map((p) => {
+                event.midiPitches.foreach((p) => {
                   if (p.pitch) {
                     const m = computeNoteAndOctaveFromMidiNoteNumber(p.pitch);
                     console.log(p.pitch, m);
