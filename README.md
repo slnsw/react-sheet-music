@@ -13,14 +13,14 @@ $ npm install @slnsw/react-sheet-music
 # Usage
 
 ```jsx
-import SheetMusic from 'react-sheet-music';
+import SheetMusic from '@slnsw/react-sheet-music';
 
 const MyComponent = () => {
   return (
     <SheetMusic
       // Textual representation of music in ABC notation
       // The string below will show four crotchets in one bar
-      notation="|EGBF|"
+      notation={"|EGBF|"}
     />
   );
 };
